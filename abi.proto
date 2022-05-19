@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package abi;
+
+// input
+message InboudCommand{
+    oneof data{
+        Set set = 1;
+        Get get = 2;
+    }
+}
+
+// output
+message OutboundCommand{
+    
+}
+
+// set key = value
+message Set{
+    string key = 1;
+    Value value = 2;
+}
+
+// get key
+message Get{
+    string key = 1;
+}
+
+// value
+message Value {
+    oneof value {
+      string string = 1;
+      bytes binary = 2;
+      int64 integer = 3;
+      double float = 4;
+      bool bool = 5;
+    }
+}
