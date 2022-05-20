@@ -2,13 +2,13 @@ mod ae;
 mod error;
 mod net;
 mod pb;
-mod repo;
+mod store;
 
 pub use ae::*;
 pub use error::*;
 pub use net::*;
 pub use pb::*;
-pub use repo::*;
+pub use store::*;
 
 #[cfg(test)]
 mod tests {

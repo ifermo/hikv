@@ -3,16 +3,19 @@ syntax = "proto3";
 package abi;
 
 // input
-message InboudCommand{
+message CommandRequest{
     oneof data{
         Set set = 1;
         Get get = 2;
+        Del del = 3;
     }
 }
 
 // output
-message OutboundCommand{
-    
+message CommandResponse{
+    oneof data{
+        Value value = 1;
+    }
 }
 
 // set key = value
@@ -23,6 +26,11 @@ message Set{
 
 // get key
 message Get{
+    string key = 1;
+}
+
+// delete key
+message Del{
     string key = 1;
 }
 
