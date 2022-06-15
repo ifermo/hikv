@@ -1,7 +1,7 @@
 /// input
 #[derive(PartialOrd, Clone, PartialEq, ::prost::Message)]
 pub struct CommandRequest {
-    #[prost(oneof = "command_request::Data", tags = "1, 2, 3")]
+    #[prost(oneof = "command_request::Data", tags = "1, 2, 3, 4")]
     pub data: ::core::option::Option<command_request::Data>,
 }
 /// Nested message and enum types in `CommandRequest`.
@@ -14,21 +14,22 @@ pub mod command_request {
         Get(super::Get),
         #[prost(message, tag = "3")]
         Del(super::Del),
+        #[prost(message, tag = "4")]
+        Exist(super::Exist),
     }
 }
 /// output
 #[derive(PartialOrd, Clone, PartialEq, ::prost::Message)]
 pub struct CommandResponse {
-    #[prost(oneof = "command_response::Data", tags = "1")]
-    pub data: ::core::option::Option<command_response::Data>,
-}
-/// Nested message and enum types in `CommandResponse`.
-pub mod command_response {
-    #[derive(PartialOrd, Clone, PartialEq, ::prost::Oneof)]
-    pub enum Data {
-        #[prost(message, tag = "1")]
-        Value(super::Value),
-    }
+    /// 状态码；复用 HTTP 2xx/4xx/5xx 状态码
+    #[prost(uint32, tag = "1")]
+    pub status: u32,
+    /// 如果不是 2xx，message 里包含详细的信息
+    #[prost(string, tag = "2")]
+    pub message: ::prost::alloc::string::String,
+    /// 成功返回 values
+    #[prost(message, repeated, tag = "3")]
+    pub values: ::prost::alloc::vec::Vec<Value>,
 }
 /// set key = value
 #[derive(PartialOrd, Clone, PartialEq, ::prost::Message)]
@@ -47,6 +48,12 @@ pub struct Get {
 /// delete key
 #[derive(PartialOrd, Clone, PartialEq, ::prost::Message)]
 pub struct Del {
+    #[prost(string, tag = "1")]
+    pub key: ::prost::alloc::string::String,
+}
+/// exist key
+#[derive(PartialOrd, Clone, PartialEq, ::prost::Message)]
+pub struct Exist {
     #[prost(string, tag = "1")]
     pub key: ::prost::alloc::string::String,
 }
