@@ -18,6 +18,9 @@ rustyline = "9"
 syntect = "5.0"
 tracing = "0.1"
 tracing-subscriber = "0.3"
+sled = "0.34.7"
+tempfile = "3"
+rocksdb = { version = "0.18",default-features = false, features = ["lz4"] }
 
 [dev-dependencies]
 anyhow = "1"

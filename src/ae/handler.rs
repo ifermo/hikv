@@ -42,7 +42,10 @@ impl CommandHandler for Exist {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{CommandRequest, MemTable, ae::{assert_ok, assert_err}, dispatch};
+    use crate::{
+        ae::{assert_err, assert_ok},
+        dispatch, CommandRequest, MemTable,
+    };
 
     #[test]
     fn should_work_set() {
@@ -101,7 +104,7 @@ mod tests {
     }
 
     #[test]
-    fn should_work_exist_command(){
+    fn should_work_exist_command() {
         let store = MemTable::new();
 
         let cmd = CommandRequest::new_exist("country");
@@ -115,5 +118,4 @@ mod tests {
         let ret = dispatch(cmd, &store);
         assert_ok(ret, &[true.into()]);
     }
-
 }

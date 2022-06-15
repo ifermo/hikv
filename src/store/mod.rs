@@ -1,7 +1,11 @@
 use crate::{HikvError, Value};
 
 mod memory;
+mod sleddb;
+mod rocks_db;
 pub use memory::MemTable;
+pub use sleddb::SledDb;
+pub use rocks_db::RocksDb;
 
 pub trait Storage {
     /// 保存 key-value,返回 old value
@@ -23,32 +27,44 @@ pub trait Storage {
 
 #[cfg(test)]
 mod tests {
+    use tempfile::tempdir;
+
     use super::*;
 
     #[test]
     fn should_work_memtable_basic() {
         let store = MemTable::new();
+        test_basic_interface(store);
+    }
 
+    #[test]
+    fn should_work_sleddb_basic() {
+        let dir = tempdir().unwrap();
+        let store = SledDb::new(dir);
+        test_basic_interface(store);
+    }
+
+    fn test_basic_interface(store: impl Storage) {
         let v = store.set("hello", "world");
         assert!(v.unwrap().is_none());
 
         let v1 = store.set("hello", "world0");
-        assert_eq!(v1, Ok(Some("world".into())));
+        assert_eq!(v1.unwrap(), Some("world".into()));
 
         let v = store.get("hello");
-        assert_eq!(v, Ok(Some("world0".into())));
+        assert_eq!(v.unwrap(), Some("world0".into()));
 
-        assert_eq!(Ok(None), store.get("lang"));
+        assert_eq!(None, store.get("lang").unwrap());
         assert!(store.get("language").unwrap().is_none());
 
-        assert_eq!(store.contains("hello"), Ok(true));
-        assert_eq!(store.contains("lang"), Ok(false));
-        assert_eq!(store.contains("language"), Ok(false));
+        assert_eq!(store.contains("hello").unwrap(), true);
+        assert_eq!(store.contains("lang").unwrap(), false);
+        assert_eq!(store.contains("language").unwrap(), false);
 
         let v = store.del("hello");
-        assert_eq!(v, Ok(Some("world0".into())));
+        assert_eq!(v.unwrap(), Some("world0".into()));
 
-        assert_eq!(Ok(None), store.del("hello"));
-        assert_eq!(Ok(None), store.del("lang"));
+        assert_eq!(None, store.del("hello").unwrap());
+        assert_eq!(None, store.del("lang").unwrap());
     }
 }

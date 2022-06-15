@@ -1,7 +1,7 @@
 use anyhow::Result;
 use async_prost::AsyncProstStream;
 use futures::prelude::*;
-use hikv::{CommandRequest, CommandResponse, MemTable, Service, ServiceInner};
+use hikv::{CommandRequest, CommandResponse, Service, ServiceInner, SledDb};
 use tokio::net::TcpListener;
 use tracing::info;
 
@@ -9,7 +9,12 @@ use tracing::info;
 async fn main() -> Result<()> {
     tracing_subscriber::fmt::init();
 
-    let service: Service = ServiceInner::new(MemTable::new()).into();
+    let service: Service<SledDb> = ServiceInner::new(SledDb::new("/tmp/hikv"))
+        .fn_before_reply(|ret| match ret.message.as_ref() {
+            "" => ret.message = "altered. Original message is empty.".into(),
+            s => ret.message = format!("altered: {}", s),
+        })
+        .into();
 
     let addr = "127.0.0.1:9527";
     let listener = TcpListener::bind(addr).await?;

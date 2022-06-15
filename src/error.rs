@@ -2,7 +2,7 @@ use thiserror::Error;
 
 use crate::Value;
 
-#[derive(Error, Debug, PartialEq)]
+#[derive(Error, Debug)]
 pub enum HikvError {
     #[error("Internal error: {0}")]
     Internal(String),
@@ -24,4 +24,12 @@ pub enum HikvError {
 
     #[error("Failed to decode protobuf message")]
     DecodeError(#[from] prost::DecodeError),
+
+    #[error("Failed to access sled db")]
+    SledError(#[from] sled::Error),
+    #[error("I/O error")]
+    IoError(#[from] std::io::Error),
+
+    #[error("Failed to access rocksdb db")]
+    RocksError(#[from] rocksdb::Error),
 }
