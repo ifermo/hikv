@@ -13,6 +13,7 @@ impl SledDb {
 }
 
 /// 把 Option> flip 成 Result, E>
+#[inline]
 fn flip<T, E>(x: Option<Result<T, E>>) -> Result<Option<T>, E> {
     x.map_or(Ok(None), |v| v.map(Some))
 }

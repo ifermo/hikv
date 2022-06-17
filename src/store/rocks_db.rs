@@ -12,10 +12,10 @@ impl RocksDb {
     }
 }
 
-/// 把 Result<Option<Vec<u8>>, rocksdb::Error> convert 成 Result<Option<Value>, HikvError>
-fn convert(x: Result<Option<Vec<u8>>, rocksdb::Error>) -> Result<Option<Value>, HikvError> {
-    x.map_err(|e| e.into())
-        .map(|v| v.map(|v| Value::try_from(&v[..]).unwrap()))
+#[inline]
+fn to_value(val: Option<Vec<u8>>) -> Result<Option<Value>, HikvError> {
+    val.map(|v| Value::try_from(&v[..]))
+        .map_or(Ok(None), |v| v.map(Some))
 }
 
 impl Storage for RocksDb {
@@ -25,29 +25,25 @@ impl Storage for RocksDb {
         value: impl Into<crate::Value>,
     ) -> Result<Option<crate::Value>, crate::HikvError> {
         let key = key.into();
-        let ret = self.0.get(key.clone());
-        if ret.is_ok() {
+
+        let val = self.0.get(&key)?;
+        {
             let data: Vec<u8> = value.into().try_into()?;
-            if let Err(e) = self.0.put(key, data) {
-                return Err(e.into());
-            }
+            self.0.put(key, data)?;
         }
-        return convert(ret);
+        to_value(val)
     }
 
     fn get(&self, key: &str) -> Result<Option<crate::Value>, crate::HikvError> {
-        let ret = self.0.get(key.clone());
-        return convert(ret);
+        to_value(self.0.get(key)?)
     }
 
     fn del(&self, key: &str) -> Result<Option<crate::Value>, crate::HikvError> {
-        let ret = self.0.get(key);
-        if ret.is_ok() {
-            if let Err(e) = self.0.delete(key) {
-                return Err(e.into());
-            }
+        let val = self.0.get(key)?;
+        {
+            self.0.delete(key)?;
         }
-        return convert(ret);
+        to_value(val)
     }
 
     fn contains(&self, key: &str) -> Result<bool, crate::HikvError> {
