@@ -32,4 +32,7 @@ pub enum HikvError {
 
     #[error("Failed to access rocksdb db")]
     RocksError(#[from] rocksdb::Error),
+
+    #[error("frame error")]
+    FrameError,
 }

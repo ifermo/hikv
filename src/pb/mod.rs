@@ -61,6 +61,16 @@ impl From<Value> for CommandResponse {
     }
 }
 
+impl From<Vec<Value>> for CommandResponse {
+    fn from(values: Vec<Value>) -> Self {
+        Self {
+            status: 200,
+            message: "".into(),
+            values,
+        }
+    }
+}
+
 impl From<bool> for Value {
     fn from(b: bool) -> Self {
         Self {

@@ -186,14 +186,14 @@ mod tests {
 use crate::Value;
 
 #[cfg(test)]
-fn assert_ok(ret: CommandResponse, values: &[Value]) {
+pub fn assert_ok(ret: CommandResponse, values: &[Value]) {
     assert_eq!(ret.status, 200);
     assert_eq!(ret.message, "");
     assert_eq!(ret.values, values)
 }
 
 #[cfg(test)]
-fn assert_err(ret: CommandResponse, code: u32, msg: &str) {
+pub fn assert_err(ret: CommandResponse, code: u32, msg: &str) {
     assert_eq!(ret.status, code);
     assert!(ret.message.contains(msg));
     assert_eq!(ret.values, &[])
