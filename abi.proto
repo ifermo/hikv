@@ -8,14 +8,18 @@ message CommandRequest{
         Set set = 1;
         Get get = 2;
         Del del = 3;
+        Exist exist = 4;
     }
 }
 
 // output
 message CommandResponse{
-    oneof data{
-        Value value = 1;
-    }
+    // 状态码；复用 HTTP 2xx/4xx/5xx 状态码
+    uint32 status = 1;
+    // 如果不是 2xx，message 里包含详细的信息
+    string message = 2;
+    // 成功返回 values
+    repeated Value values = 3;
 }
 
 // set key = value
@@ -31,6 +35,11 @@ message Get{
 
 // delete key
 message Del{
+    string key = 1;
+}
+
+// exist key
+message Exist{
     string key = 1;
 }
 
